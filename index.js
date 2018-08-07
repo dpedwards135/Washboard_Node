@@ -64,15 +64,27 @@ exports.updateDefaultSource = functions.database.ref('user/{userID}/srcId').onWr
         console.log(snapshot.val());
         var user = snapshot.val();
 
-        stripe.customers.update(user, {
-            default_source: srcId,
-          }, function(err, customer) {
+        stripe.customers.createSource(user, {
+            source: srcId
+          }, function(err, source) {
             if(err != null) {console.log("Error: " + JSON.stringify(err))}
-                if(customer != null) {
+                if(source != null) {
 
-                console.log("Source save " + JSON.stringify(customer));
+                console.log("Source save " + JSON.stringify(source));
+
+                stripe.customers.update(user, {
+                    default_source: srcId,
+                  }, function(err, customer) {
+                    if(err != null) {console.log("Error: " + JSON.stringify(err))}
+                        if(customer != null) {
+        
+                        console.log("Source save " + JSON.stringify(customer));
+                        }
+                  });
                 }
           });
+
+        
         });
     });
 
